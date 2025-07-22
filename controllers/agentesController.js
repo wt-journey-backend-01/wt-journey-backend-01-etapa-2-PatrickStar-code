@@ -1,6 +1,6 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
-const agentesRepository = require("../repository/agentesRepository");
+const agentesRepository = require("../repositories/agentesRepository");
 
 const cargosValidos = ["inspetor", "delegado", "subdelegado"];
 
