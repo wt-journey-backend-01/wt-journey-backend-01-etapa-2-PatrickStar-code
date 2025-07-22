@@ -39,7 +39,7 @@ function getById(req, res, next) {
   try {
     const id = req.params.id;
 
-    if (id === null) {
+    if (!id) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
     const caso = casosRepository.findById(id);
@@ -74,13 +74,15 @@ function create(req, res, next) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
 
-    const caso = casosRepository.create({
+    const casosData = {
       id: uuidv4(),
       titulo,
       descricao,
       status,
       agente_id,
-    });
+    };
+
+    const caso = casosRepository.create(casosData);
 
     return res.status(201).json(caso);
   } catch (error) {
@@ -114,12 +116,14 @@ function update(req, res, next) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
 
-    const caso = casosRepository.update(req.params.id, {
+    const newData = {
       titulo,
       descricao,
       status,
       agente_id,
-    });
+    };
+
+    const caso = casosRepository.update(req.params.id, newData);
     return res.status(200).json(caso);
   } catch (error) {
     next(error);

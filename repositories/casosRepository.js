@@ -1,4 +1,5 @@
 const express = require("express");
+const agentesRepository = require("./agentesRepository");
 
 /*
    {
@@ -39,7 +40,8 @@ function findById(id) {
 }
 
 function create(caso) {
-  return casosData.push(caso);
+  casosData.push(caso);
+  return caso;
 }
 
 function update(caso, id) {
@@ -51,7 +53,9 @@ function update(caso, id) {
 
 function deleteCaso(id) {
   const index = casosData.findIndex((caso) => caso.id === id);
-  casos.splice(index, 1);
+  if (index !== -1) {
+    casosData.splice(index, 1);
+  }
 }
 
 function getAgente(casoId) {

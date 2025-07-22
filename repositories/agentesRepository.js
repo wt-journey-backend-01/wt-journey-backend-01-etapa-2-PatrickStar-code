@@ -14,10 +14,18 @@ function findAll({ cargo, sort } = {}) {
     result = result.filter((agente) => agente.cargo === cargo);
   }
 
+  if (dataDeIncorporacao) {
+    result = result.filter(
+      (agente) => agente.dataDeIncorporacao === dataDeIncorporacao
+    );
+  }
+
   if (sort) {
     result.sort((a, b) => {
-      if (a[sort] < b[sort]) return -1;
-      if (a[sort] > b[sort]) return 1;
+      if (sort === "asc")
+        return a.dataDeIncorporacao.localeCompare(b.dataDeIncorporacao);
+      if (sort === "desc")
+        return b.dataDeIncorporacao.localeCompare(a.dataDeIncorporacao);
       return 0;
     });
   }
@@ -29,8 +37,9 @@ function findById(id) {
   return agentes.find((agente) => agente.id === id);
 }
 
-function create({ id, nome, dataDeIncorporacao, cargo }) {
-  return agentes.push({ id, nome, dataDeIncorporacao, cargo });
+function create(agente) {
+  agentes.push(agente);
+  return agente;
 }
 
 function deleteAgente(id) {

@@ -18,7 +18,7 @@ function findAll(req, res) {
 function findById(req, res, next) {
   try {
     const id = req.params.id;
-    if (id === null) {
+    if (!id) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     } else {
       const agente = agentesRepository.findById(id);
@@ -35,7 +35,7 @@ function findById(req, res, next) {
 function deleteAgente(req, res, next) {
   try {
     const id = req.params.id;
-    if (id === null) {
+    if (!id) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     } else {
       if (!agentesRepository.findById(id)) {
@@ -70,12 +70,13 @@ function createAgente(req, res, next) {
     if (!nome || !dataDeIncorporacao || !cargo) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     } else {
-      const agente = agentesRepository.create({
+      const newAgente = {
         id: uuidv4(),
         nome,
         dataDeIncorporacao,
         cargo,
-      });
+      };
+      const agente = agentesRepository.create(newAgente);
 
       return res.status(201).json(agente);
     }
@@ -108,7 +109,7 @@ function patchAgentes(req, res, next) {
 
     if (
       updates.dataDeIncorporacao &&
-      !/^\d{4}-\d{2}-\d{2}$/.test(updates.dataDeIncorporacao)
+      !/^\d{4}-\d{2}-\d{2}$/.test(dataDeIncorporacao)
     ) {
       return res.status(400).json({
         message:
@@ -116,12 +117,18 @@ function patchAgentes(req, res, next) {
       });
     }
 
-    if (updates.cargo && !cargosValidos.includes(updates.cargo)) {
+    if (cargo && !cargosValidos.includes(cargo)) {
       return res.status(400).json({
         message:
           "O campo cargo pode ser somente 'inspetor', 'delegado' ou 'subdelegado'",
       });
     }
+
+    const updates = {
+      nome,
+      dataDeIncorporacao,
+      cargo,
+    };
 
     agentesRepository.patchAgentes(id, updates);
     return res.status(204).send();
