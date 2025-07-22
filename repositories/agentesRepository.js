@@ -1,4 +1,3 @@
-const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 /*
 id: string (UUID) obrigatório.
@@ -31,12 +30,12 @@ function findById(id) {
 }
 
 function create({ id, nome, dataDeIncorporacao, cargo }) {
-  agentes.push({ id, nome, dataDeIncorporacao, cargo });
+  return agentes.push({ id, nome, dataDeIncorporacao, cargo });
 }
 
 function deleteAgente(id) {
   const index = agentes.findIndex((agente) => agente.id === id);
-  agentes.splice(index);
+  agentes.splice(index, 1);
 }
 
 function updateAgente(id, agente) {

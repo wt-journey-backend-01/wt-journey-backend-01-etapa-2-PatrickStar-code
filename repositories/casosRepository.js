@@ -16,11 +16,11 @@ function getAll({ agente_id, casos }) {
   let result = [...casosData];
 
   if (agente_id) {
-    result.filter((caso) => caso.agente_id === agente_id);
+    result = result.filter((caso) => caso.agente_id === agente_id);
   }
 
   if (casos) {
-    result.filter((caso) => caso.status === casos);
+    result = result.filter((caso) => caso.status === casos);
   }
 
   return result;
@@ -39,21 +39,25 @@ function findById(id) {
 }
 
 function create(caso) {
-  casosData.push(caso);
+  return casosData.push(caso);
 }
 
 function update(caso, id) {
-  const index = casosData.find((caso) => caso.id === id);
-  casosData[index] = { ...casosData[index], ...caso };
+  const index = casosData.findIndex((c) => c.id === id);
+  if (index !== -1) {
+    casosData[index] = { ...casosData[index], ...caso };
+  }
 }
 
 function deleteCaso(id) {
-  const index = casosData.find((caso) => caso.id === id);
-  casos.splice(index);
+  const index = casosData.findIndex((caso) => caso.id === id);
+  casos.splice(index, 1);
 }
 
-function getAgente(id) {
-  return casosData.find((caso) => caso.agente_id === id);
+function getAgente(casoId) {
+  const caso = casosData.find((c) => c.id === casoId);
+  if (!caso) return null;
+  return agentesRepository.findById(caso.agente_id);
 }
 
 function partialUpdate(id, caso) {

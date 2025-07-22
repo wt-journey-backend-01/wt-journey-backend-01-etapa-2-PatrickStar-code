@@ -97,10 +97,13 @@ function patchAgentes(req, res, next) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
 
-    const updates = req.body;
+    const { nome, dataDeIncorporacao, cargo } = req.body;
 
-    if (!updates || Object.keys(updates).length === 0) {
-      return res.status(400).json({ message: "Nenhum dado para atualizar" });
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataDeIncorporacao)) {
+      return res.status(400).json({
+        message:
+          "Campo dataDeIncorporacao deve seguir a formatação 'YYYY-MM-DD' ",
+      });
     }
 
     if (
