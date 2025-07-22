@@ -1,7 +1,7 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
-const casosRepository = require("../repository/casosRepository");
-const agentesRepository = require("../repository/agentesRepository");
+const casosRepository = require("../repositories/casosRepository");
+const agentesRepository = require("../repositories/agentesRepository");
 
 const enumStatus = ["aberto", "solucionado"];
 
@@ -60,12 +60,7 @@ function create(req, res, next) {
     }
     const { titulo, descricao, status, agente_id } = req.body;
 
-    if (
-      titulo === null ||
-      descricao === null ||
-      status === null ||
-      agente_id === null
-    ) {
+    if (!titulo || !descricao || !status || !agente_id) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
 
@@ -105,12 +100,7 @@ function update(req, res, next) {
 
     const { titulo, descricao, status, agente_id } = req.body;
 
-    if (
-      titulo === null ||
-      descricao === null ||
-      status === null ||
-      agente_id === null
-    ) {
+    if (!titulo || !descricao || !status || !agente_id) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
 
