@@ -1,9 +1,16 @@
 const express = require("express");
+const { validate: isUuid } = require("uuid");
 const { v4: uuidv4 } = require("uuid");
 const casosRepository = require("../repositories/casosRepository");
 const agentesRepository = require("../repositories/agentesRepository");
 
 const enumStatus = ["aberto", "solucionado"];
+
+function validateId(id) {
+  if (!id || !isUuid(id)) {
+    return res.status(400).json({ message: "Parâmetros inválidos" });
+  }
+}
 
 function getAll(req, res, next) {
   const { agente_id, casos } = req.query;
@@ -29,6 +36,9 @@ function getAgente(req, res, next) {
   try {
     const id = req.params.casos_id;
     const agente = casosRepository.getAgente(id);
+    if (!agente) {
+      return res.status(404).json({ message: "Caso ou agente inexistente" });
+    }
     return res.status(200).json(agente);
   } catch (error) {
     next(error);
@@ -39,9 +49,8 @@ function getById(req, res, next) {
   try {
     const id = req.params.id;
 
-    if (!id) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    }
+    validateId(id);
+
     const caso = casosRepository.findById(id);
 
     if (!caso) {
@@ -96,6 +105,8 @@ function update(req, res, next) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
 
+    validateId(req.params.id);
+
     if (!casosRepository.findById(req.params.id)) {
       return res.status(404).json({ message: "Caso inexistente" });
     }
@@ -132,11 +143,12 @@ function update(req, res, next) {
 
 function deleteCaso(req, res, next) {
   try {
+    validateId(req.params.id);
     if (!casosRepository.findById(req.params.id)) {
       return res.status(404).json({ message: "Caso inexistente" });
     }
     casosRepository.deleteCaso(req.params.id);
-    return res.status(204).json();
+    return res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -146,9 +158,7 @@ function partialUpdate(req, res, next) {
   try {
     const { id } = req.params;
 
-    if (!id) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    }
+    validateId(id);
 
     if (!casosRepository.findById(id)) {
       return res.status(404).json({ message: "Caso inexistente" });

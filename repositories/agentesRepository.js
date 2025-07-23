@@ -7,7 +7,7 @@ cargo: ("inspetor", "delegado", etc.) obrigatório.
 */
 const agentes = [];
 
-function findAll({ cargo, sort } = {}) {
+function findAll({ cargo, sort, dataDeIncorporacao } = {}) {
   let result = [...agentes];
 
   if (cargo) {

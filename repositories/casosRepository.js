@@ -13,15 +13,15 @@ const agentesRepository = require("./agentesRepository");
 
 const casosData = [];
 
-function getAll({ agente_id, casos }) {
+function getAll({ agente_id, status }) {
   let result = [...casosData];
 
   if (agente_id) {
     result = result.filter((caso) => caso.agente_id === agente_id);
   }
 
-  if (casos) {
-    result = result.filter((caso) => caso.status === casos);
+  if (status) {
+    result = result.filter((caso) => caso.status === status);
   }
 
   return result;
@@ -48,7 +48,9 @@ function update(caso, id) {
   const index = casosData.findIndex((c) => c.id === id);
   if (index !== -1) {
     casosData[index] = { ...casosData[index], ...caso };
+    return casosData[index];
   }
+  return null;
 }
 
 function deleteCaso(id) {

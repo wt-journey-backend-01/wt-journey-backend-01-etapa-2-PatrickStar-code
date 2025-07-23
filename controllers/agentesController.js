@@ -4,6 +4,12 @@ const agentesRepository = require("../repositories/agentesRepository");
 
 const cargosValidos = ["inspetor", "delegado", "subdelegado"];
 
+function validateId(id) {
+  if (!id || !isUuid(id)) {
+    return res.status(400).json({ message: "Parâmetros inválidos" });
+  }
+}
+
 function findAll(req, res) {
   const { cargo, sort } = req.query;
 
@@ -18,15 +24,13 @@ function findAll(req, res) {
 function findById(req, res, next) {
   try {
     const id = req.params.id;
-    if (!id) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    } else {
-      const agente = agentesRepository.findById(id);
-      if (!agente) {
-        return res.status(404).json({ message: "Agente inexistente" });
-      }
-      return res.status(200).json(agente);
+
+    validateId(id);
+    const agente = agentesRepository.findById(id);
+    if (!agente) {
+      return res.status(404).json({ message: "Agente inexistente" });
     }
+    return res.status(200).json(agente);
   } catch (err) {
     next(err);
   }
@@ -35,15 +39,12 @@ function findById(req, res, next) {
 function deleteAgente(req, res, next) {
   try {
     const id = req.params.id;
-    if (!id) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    } else {
-      if (!agentesRepository.findById(id)) {
-        return res.status(404).json({ message: "Agente inexistente" });
-      }
-      agentesRepository.deleteAgente(id);
-      return res.status(204).json();
+    validateId(id);
+    if (!agentesRepository.findById(id)) {
+      return res.status(404).json({ message: "Agente inexistente" });
     }
+    agentesRepository.deleteAgente(id);
+    return res.status(204).send();
   } catch (err) {
     next(err);
   }
@@ -89,9 +90,7 @@ function patchAgentes(req, res, next) {
   try {
     const { id } = req.params;
 
-    if (!id) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    }
+    validateId(id);
 
     const findingAgente = agentesRepository.findById(id);
     if (!findingAgente) {
@@ -104,16 +103,6 @@ function patchAgentes(req, res, next) {
       return res.status(400).json({
         message:
           "Campo dataDeIncorporacao deve seguir a formatação 'YYYY-MM-DD' ",
-      });
-    }
-
-    if (
-      updates.dataDeIncorporacao &&
-      !/^\d{4}-\d{2}-\d{2}$/.test(dataDeIncorporacao)
-    ) {
-      return res.status(400).json({
-        message:
-          "Campo dataDeIncorporacao deve seguir a formatação 'YYYY-MM-DD'",
       });
     }
 
@@ -143,11 +132,12 @@ function updateAgente(req, res, next) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
     const id = req.params.id;
+    validateId(id);
     const { nome, dataDeIncorporacao, cargo } = req.body;
     if (!agentesRepository.findById(id)) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(updates.dataDeIncorporacao)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataDeIncorporacao)) {
       return res.status(400).json({
         message:
           "Campo dataDeIncorporacao deve seguir a formatação 'YYYY-MM-DD' ",
