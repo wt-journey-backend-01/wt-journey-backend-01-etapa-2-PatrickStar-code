@@ -40,13 +40,18 @@ function create(agente) {
 
 function deleteAgente(id) {
   const index = agentes.findIndex((agente) => agente.id === id);
-  agentes.splice(index, 1);
+  if (index !== -1) {
+    agentes.splice(index, 1);
+    return true;
+  }
+  return false;
 }
 
-function updateAgente(agente, id) {
+function updateAgente(id, agente) {
   const index = agentes.findIndex((agente) => agente.id === id);
   if (index !== -1) {
-    return (agentes[index] = agente);
+    agentes[index] = { id, ...agente }; // garante que o id não seja alterado
+    return agentes[index];
   }
   return null;
 }

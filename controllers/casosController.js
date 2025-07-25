@@ -31,8 +31,12 @@ const CasoSchema = z.object({
 const CasoPartial = CasoSchema.partial();
 
 function getAll(req, res, next) {
+  const parsed = QueryParamsSchema.safeParse(req.query);
+  if (!parsed.success) {
+    return res.status(400).json({ message: parsed.error.errors[0].message });
+  }
   try {
-    const { agente_id, status } = QueryParamsSchema.safeParse(req.query).data;
+    const { agente_id, status } = parsed.data;
 
     const casosResult = casosRepository.getAll({ agente_id, status });
     return res.status(200).send(casosResult);
@@ -43,10 +47,15 @@ function getAll(req, res, next) {
 
 function search(req, res, next) {
   try {
-    const { q } = searchQuerySchema.safeParse(req.query).data;
+    const parsed = searchQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.errors[0].message });
+    }
+
+    const { q } = parsed.data;
     const resultado = casosRepository.search(q);
     if (resultado === null) {
-      return res.status(404).json({ message: "Caso não encontrado" });
+      return res.status(200).send([]);
     }
     res.status(200).json(resultado);
   } catch (error) {
@@ -95,13 +104,8 @@ function getById(req, res, next) {
 function update(req, res, next) {
   try {
     const { id } = req.params;
-    console.log(id);
-    console.log(req.params);
-    console.log(req.params.id);
 
     if (!isUuid(id)) {
-      console.log(id);
-      console.log("to aqui");
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
 

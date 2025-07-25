@@ -56,7 +56,11 @@ function update(id, caso) {
 
 function deleteCaso(id) {
   const index = casosData.findIndex((caso) => caso.id === id);
-  casosData.splice(index, 1);
+  if (index !== -1) {
+    casosData.splice(index, 1);
+    return true;
+  }
+  return false;
 }
 
 function patch(id, NewCaso) {

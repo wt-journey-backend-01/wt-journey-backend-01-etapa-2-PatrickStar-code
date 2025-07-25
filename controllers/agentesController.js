@@ -10,7 +10,7 @@ const AgenteSchema = z.object({
 
   dataDeIncorporacao: z
     .string({ required_error: "O campo 'nome' é obrigatório." })
-    .regex(/^\d{4}\/\d{2}\/\d{2}$/, {
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
       message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
     }),
 
@@ -40,7 +40,12 @@ const querySchema = z.object({
 
 function findAll(req, res, next) {
   try {
-    const { cargo, sort } = querySchema.safeParse(req.query).data;
+    const parsed = querySchema.safeParse(req.query);
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.errors[0].message });
+    }
+
+    const { cargo, sort } = parsed.data;
 
     const agentes = agentesRepository.findAll({
       cargo,
@@ -95,7 +100,7 @@ function deleteAgente(req, res, next) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
     agentesRepository.deleteAgente(id);
-    return res.status(204).json();
+    return res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -122,7 +127,7 @@ function updateAgente(req, res, next) {
         .json({ message: "Agente não atualizado/não encontrado" });
     }
 
-    return res.status(204).json();
+    return res.status(200).json(updateAgente);
   } catch (error) {
     next(error);
   }
