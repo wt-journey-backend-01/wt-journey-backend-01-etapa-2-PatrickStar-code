@@ -32,7 +32,7 @@ const agentesController = require("../controllers/agentesController");
  *       200:
  *         description: Lista de agentes
  */
-router.get("/agentes", agentesController.findAll);
+router.get("/", agentesController.findAll);
 
 /**
  * @swagger
@@ -55,7 +55,7 @@ router.get("/agentes", agentesController.findAll);
  *       404:
  *         description: Agente não encontrado
  */
-router.get("/agentes/:id", agentesController.findById);
+router.get("/:id", agentesController.findById);
 
 /**
  * @swagger
@@ -85,7 +85,7 @@ router.get("/agentes/:id", agentesController.findById);
  *       400:
  *         description: Dados inválidos
  */
-router.post("/agentes", agentesController.create);
+router.post("/", agentesController.create);
 
 /**
  * @swagger
@@ -107,11 +107,11 @@ router.post("/agentes", agentesController.create);
  *       404:
  *         description: Agente não encontrado
  */
-router.delete("/agentes/:id", agentesController.deleteAgente);
+router.delete("/:id", agentesController.deleteAgente);
 
 /**
  * @swagger
- * /agentes/{id}:
+ * /{id}:
  *   put:
  *     summary: Atualiza todos os dados de um agente
  *     tags: [Agentes]
@@ -145,11 +145,11 @@ router.delete("/agentes/:id", agentesController.deleteAgente);
  *       404:
  *         description: Agente não encontrado
  */
-router.put("/agentes/:id", agentesController.updateAgente);
+router.put("/:id", agentesController.updateAgente);
 
 /**
  * @swagger
- * /agentes/{id}:
+ * /{id}:
  *   patch:
  *     summary: Atualiza parcialmente os dados de um agente
  *     tags: [Agentes]
@@ -182,6 +182,6 @@ router.put("/agentes/:id", agentesController.updateAgente);
  *       404:
  *         description: Agente não encontrado
  */
-router.patch("/agentes/:id", agentesController.patch);
+router.patch("/:id", agentesController.patch);
 
 module.exports = router;

@@ -9,7 +9,7 @@ const errorHandler = require("../utils/errorHandler");
 const enumStatus = ["aberto", "solucionado"];
 
 const QueryParamsSchema = z.object({
-  agente_id: z.uuidv4().optional(),
+  agente_id: z.uuid().optional(),
   status: z
     .enum(["aberto", "solucionado"], {
       required_error: "Status é obrigatório.",
@@ -25,7 +25,7 @@ const CasoSchema = z.object({
   titulo: z.string({ required_error: "Titulo é obrigatório." }),
   descricao: z.string({ required_error: "Descrição é obrigatório." }),
   status: z.enum(enumStatus, { required_error: "Status é obrigatório." }),
-  agente_id: z.uuidv4({ required_error: "Agente é obrigatório." }),
+  agente_id: z.uuid({ required_error: "Agente é obrigatório." }),
 });
 
 const CasoPartial = CasoSchema.partial();
@@ -65,8 +65,8 @@ function search(req, res, next) {
 
 function create(req, res, next) {
   try {
-    const { error } = CasoSchema.safeParse(req.body);
-    if (error) {
+    const parsed = CasoSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ message: error.message });
     }
 
@@ -87,7 +87,9 @@ function getById(req, res, next) {
     const id = req.params.id;
 
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
 
     const caso = casosRepository.findById(id);
@@ -106,11 +108,13 @@ function update(req, res, next) {
     const { id } = req.params;
 
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
 
-    const { error } = CasoSchema.safeParse(req.body);
-    if (error) {
+    const parsed = CasoSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ message: error.message });
     }
 
@@ -132,7 +136,9 @@ function deleteCaso(req, res, next) {
   try {
     const { id } = req.params;
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
 
     if (casosRepository.findById(id) === undefined) {
@@ -153,11 +159,13 @@ function patch(req, res, next) {
   try {
     const { id } = req.params;
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
 
-    const { error } = CasoPartial.safeParse(req.body);
-    if (error) {
+    const parsed = CasoPartial.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ message: error.message });
     }
 

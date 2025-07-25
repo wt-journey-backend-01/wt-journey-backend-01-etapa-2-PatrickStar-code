@@ -34,7 +34,7 @@ const casosController = require("../controllers/casosController");
  *       200:
  *         description: Lista de casos
  */
-router.get("/casos", casosController.getAll);
+router.get("/", casosController.getAll);
 
 /**
  * @swagger
@@ -87,7 +87,7 @@ router.get("/search", casosController.search);
  *       404:
  *         description: Agente inexistente
  */
-router.post("/casos", casosController.create);
+router.post("/", casosController.create);
 
 /**
  * @swagger
@@ -110,7 +110,7 @@ router.post("/casos", casosController.create);
  *       404:
  *         description: Caso inexistente
  */
-router.get("/casos/:id", casosController.getById);
+router.get("/:id", casosController.getById);
 
 /**
  * @swagger
@@ -151,7 +151,7 @@ router.get("/casos/:id", casosController.getById);
  *       404:
  *         description: Caso ou agente inexistente
  */
-router.put("/casos/:id", casosController.update);
+router.put("/:id", casosController.update);
 
 /**
  * @swagger
@@ -191,7 +191,7 @@ router.put("/casos/:id", casosController.update);
  *       404:
  *         description: Caso ou agente inexistente
  */
-router.patch("/casos/:id", casosController.patch);
+router.patch("/:id", casosController.patch);
 
 /**
  * @swagger
@@ -214,7 +214,7 @@ router.patch("/casos/:id", casosController.patch);
  *       404:
  *         description: Caso não encontrado
  */
-router.delete("/casos/:id", casosController.deleteCaso);
+router.delete("/:id", casosController.deleteCaso);
 
 /**
  * @swagger
@@ -237,6 +237,6 @@ router.delete("/casos/:id", casosController.deleteCaso);
  *       404:
  *         description: Caso ou agente inexistente
  */
-router.get("/casos/:casos_id/agente", casosController.getAgente);
+router.get("/:casos_id/agente", casosController.getAgente);
 
 module.exports = router;

@@ -61,7 +61,9 @@ function findById(req, res, next) {
   try {
     const id = req.params.id;
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
     if (!agente) {
@@ -75,9 +77,9 @@ function findById(req, res, next) {
 
 function create(req, res, next) {
   try {
-    const { error } = AgenteSchema.safeParse(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.message });
+    const parsed = AgenteSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.errors[0].message });
     }
 
     const NewAgente = { id: uuidv4(), ...req.body };
@@ -93,7 +95,9 @@ function deleteAgente(req, res, next) {
   try {
     const { id } = req.params;
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
     if (!agente) {
@@ -110,15 +114,17 @@ function updateAgente(req, res, next) {
   try {
     const { id } = req.params;
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
     if (!agente) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
-    const { error } = AgenteSchema.safeParse(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.message });
+    const parsed = AgenteSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.errors[0].message });
     }
     const agenteUpdated = agentesRepository.updateAgente(id, req.body);
     if (agenteUpdated === null) {
@@ -127,7 +133,7 @@ function updateAgente(req, res, next) {
         .json({ message: "Agente não atualizado/não encontrado" });
     }
 
-    return res.status(200).json(updateAgente);
+    return res.status(200).json(agenteUpdated);
   } catch (error) {
     next(error);
   }
@@ -137,15 +143,17 @@ function patch(req, res, next) {
   try {
     const { id } = req.params;
     if (!isUuid(id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res
+        .status(400)
+        .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
     if (!agente) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
-    const { error } = AgentePartial.safeParse(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.message });
+    const parsed = AgentePartial.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.errors[0].message });
     }
     const agenteUpdated = agentesRepository.patch(id, req.body);
     if (agenteUpdated === null) {
