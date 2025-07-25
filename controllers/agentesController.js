@@ -1,126 +1,101 @@
+const { z } = require("zod");
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 const agentesRepository = require("../repositories/agentesRepository");
+const { validate: isUuid } = require("uuid");
+const errorHandler = require("../utils/errorHandler");
 
-const cargosValidos = ["inspetor", "delegado", "subdelegado"];
+const AgenteSchema = z.object({
+  nome: z.string({ required_error: "O campo 'nome' é obrigatório." }),
 
-function validateId(id) {
-  if (!id || !isUuid(id)) {
-    return res.status(400).json({ message: "Parâmetros inválidos" });
-  }
-}
+  dataDeIncorporacao: z
+    .string({ required_error: "O campo 'nome' é obrigatório." })
+    .regex(/^\d{4}\/\d{2}\/\d{2}$/, {
+      message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
+    }),
 
-function findAll(req, res) {
-  const { cargo, sort } = req.query;
+  cargo: z.enum(["inspetor", "delegado", "agente"], {
+    required_error: "O campo 'cargo' é obrigatório.",
+    invalid_type_error:
+      "O campo 'cargo' deve ser 'inspetor', 'delegado' ou 'agente'.",
+  }),
+});
 
+const AgentePartial = AgenteSchema.partial();
+
+const querySchema = z.object({
+  cargo: z
+    .enum(["inspetor", "delegado", "agente"], {
+      invalid_type_error:
+        "O campo 'cargo' deve ser 'inspetor', 'delegado' ou 'agente'.",
+    })
+    .optional(),
+  sort: z
+    .enum(["dataDeIncorporacao", "-dataDeIncorporacao"], {
+      invalid_type_error:
+        "O campo 'sort' deve ser 'dataDeIncorporacao' ou '-dataDeIncorporacao'.",
+    })
+    .optional(),
+});
+
+function findAll(req, res, next) {
   try {
-    const agentes = agentesRepository.findAll({ cargo, sort });
+    const { cargo, sort } = querySchema.safeParse(req.query).data;
+
+    const agentes = agentesRepository.findAll({
+      cargo,
+      sort,
+    });
     return res.status(200).json(agentes);
   } catch (error) {
-    return res.status(500).json({ message: "Erro ao buscar agentes", error });
+    next(error);
   }
 }
 
 function findById(req, res, next) {
   try {
     const id = req.params.id;
-
-    validateId(id);
+    if (!isUuid(id)) {
+      return res.status(400).json({ message: "Parâmetros inválidos" });
+    }
     const agente = agentesRepository.findById(id);
     if (!agente) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
     return res.status(200).json(agente);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
+  }
+}
+
+function create(req, res, next) {
+  try {
+    const { error } = AgenteSchema.safeParse(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    const NewAgente = { id: uuidv4(), ...req.body };
+
+    const agente = agentesRepository.create(NewAgente);
+    return res.status(201).json(agente);
+  } catch (error) {
+    next(error);
   }
 }
 
 function deleteAgente(req, res, next) {
   try {
-    const id = req.params.id;
-    validateId(id);
-    if (!agentesRepository.findById(id)) {
+    const { id } = req.params;
+    if (!isUuid(id)) {
+      return res.status(400).json({ message: "Parâmetros inválidos" });
+    }
+    const agente = agentesRepository.findById(id);
+    if (!agente) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
     agentesRepository.deleteAgente(id);
-    return res.status(204).send();
-  } catch (err) {
-    next(err);
-  }
-}
-
-function createAgente(req, res, next) {
-  try {
-    if (!req.body) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    }
-    const { nome, dataDeIncorporacao, cargo } = req.body;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataDeIncorporacao)) {
-      return res.status(400).json({
-        message:
-          "Campo dataDeIncorporacao deve seguir a formatação 'YYYY-MM-DD'",
-      });
-    }
-    if (!cargosValidos.includes(cargo)) {
-      return res.status(400).json({
-        message:
-          "O campo cargo pode ser somente 'inspetor', 'delegado' ou 'subdelegado' ",
-      });
-    }
-    if (!nome || !dataDeIncorporacao || !cargo) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    } else {
-      const newAgente = {
-        id: uuidv4(),
-        nome,
-        dataDeIncorporacao,
-        cargo,
-      };
-      const agente = agentesRepository.create(newAgente);
-
-      return res.status(201).json(agente);
-    }
-  } catch (err) {
-    next(err);
-  }
-}
-
-function patchAgentes(req, res, next) {
-  try {
-    const { id } = req.params;
-
-    validateId(id);
-
-    const findingAgente = agentesRepository.findById(id);
-    if (!findingAgente) {
-      return res.status(404).json({ message: "Agente inexistente" });
-    }
-
-    const { nome, dataDeIncorporacao, cargo } = req.body;
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataDeIncorporacao)) {
-      return res.status(400).json({
-        message:
-          "Campo dataDeIncorporacao deve seguir a formatação 'YYYY-MM-DD' ",
-      });
-    }
-
-    if (cargo && !cargosValidos.includes(cargo)) {
-      return res.status(400).json({
-        message:
-          "O campo cargo pode ser somente 'inspetor', 'delegado' ou 'subdelegado'",
-      });
-    }
-
-    const updates = {
-      nome,
-      dataDeIncorporacao,
-      cargo,
-    };
-
-    agentesRepository.patchAgentes(id, updates);
-    return res.status(204).send();
+    return res.status(204).json();
   } catch (error) {
     next(error);
   }
@@ -128,48 +103,63 @@ function patchAgentes(req, res, next) {
 
 function updateAgente(req, res, next) {
   try {
-    if (!req.body) {
+    const { id } = req.params;
+    if (!isUuid(id)) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
-    const id = req.params.id;
-    validateId(id);
-    const { nome, dataDeIncorporacao, cargo } = req.body;
-    if (!agentesRepository.findById(id)) {
+    const agente = agentesRepository.findById(id);
+    if (!agente) {
       return res.status(404).json({ message: "Agente inexistente" });
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataDeIncorporacao)) {
-      return res.status(400).json({
-        message:
-          "Campo dataDeIncorporacao deve seguir a formatação 'YYYY-MM-DD' ",
-      });
+    const { error } = AgenteSchema.safeParse(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.message });
     }
-    if (!cargosValidos.includes(cargo)) {
-      return res.status(400).json({
-        message:
-          "O campo cargo pode ser somente 'inspetor', 'delegado' ou 'subdelegado' ",
-      });
+    const agenteUpdated = agentesRepository.updateAgente(id, req.body);
+    if (agenteUpdated === null) {
+      return res
+        .status(404)
+        .json({ message: "Agente não atualizado/não encontrado" });
     }
-    if (nome === null || dataDeIncorporacao === null || cargo === null) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    } else {
-      const agente = agentesRepository.updateAgente(id, {
-        nome,
-        dataDeIncorporacao,
-        cargo,
-      });
 
-      return res.status(200).json(agente);
+    return res.status(204).json();
+  } catch (error) {
+    next(error);
+  }
+}
+
+function patch(req, res, next) {
+  try {
+    const { id } = req.params;
+    if (!isUuid(id)) {
+      return res.status(400).json({ message: "Parâmetros inválidos" });
     }
-  } catch (err) {
-    next(err);
+    const agente = agentesRepository.findById(id);
+    if (!agente) {
+      return res.status(404).json({ message: "Agente inexistente" });
+    }
+    const { error } = AgentePartial.safeParse(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+    const agenteUpdated = agentesRepository.patch(id, req.body);
+    if (agenteUpdated === null) {
+      return res
+        .status(404)
+        .json({ message: "Agente não atualizado/não encontrado" });
+    }
+
+    return res.status(200).json(agenteUpdated);
+  } catch (error) {
+    next(error);
   }
 }
 
 module.exports = {
   findAll,
   findById,
+  create,
   deleteAgente,
-  createAgente,
   updateAgente,
-  patchAgentes,
+  patch,
 };

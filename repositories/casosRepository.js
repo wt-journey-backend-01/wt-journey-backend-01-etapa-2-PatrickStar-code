@@ -13,7 +13,7 @@ const agentesRepository = require("./agentesRepository");
 
 const casosData = [];
 
-function getAll({ agente_id, status }) {
+function getAll({ agente_id, status } = {}) {
   let result = [...casosData];
 
   if (agente_id) {
@@ -27,16 +27,12 @@ function getAll({ agente_id, status }) {
   return result;
 }
 
-function search(query) {
-  query = query.toLowerCase();
-  console.log(query);
-  const teste = casosData.filter((caso) => caso.titulo.includes(query));
-  console.log(teste);
-  return teste;
-}
-
-function findById(id) {
-  return casosData.find((caso) => caso.id === id);
+function search(q) {
+  const finded = casosData.filter((caso) => caso.titulo.includes(q));
+  if (finded.length === 0) {
+    return null;
+  }
+  return finded;
 }
 
 function create(caso) {
@@ -44,7 +40,12 @@ function create(caso) {
   return caso;
 }
 
-function update(caso, id) {
+function findById(id) {
+  const casoFinded = casosData.find((caso) => caso.id === id);
+  return casoFinded;
+}
+
+function update(id, caso) {
   const index = casosData.findIndex((c) => c.id === id);
   if (index !== -1) {
     casosData[index] = { ...casosData[index], ...caso };
@@ -55,30 +56,24 @@ function update(caso, id) {
 
 function deleteCaso(id) {
   const index = casosData.findIndex((caso) => caso.id === id);
-  if (index !== -1) {
-    casosData.splice(index, 1);
-  }
+  casosData.splice(index, 1);
 }
 
-function getAgente(casoId) {
-  const caso = casosData.find((c) => c.id === casoId);
-  if (!caso) return null;
-  return agentesRepository.findById(caso.agente_id);
-}
-
-function partialUpdate(id, caso) {
+function patch(id, NewCaso) {
   const index = casosData.findIndex((caso) => caso.id === id);
-
-  casosData[index] = { ...casosData[index], ...caso };
+  if (index !== -1) {
+    casosData[index] = { ...casosData[index], ...NewCaso };
+    return casosData[index];
+  }
+  return null;
 }
 
 module.exports = {
   getAll,
-  findById,
-  create,
-  update,
-  deleteCaso,
-  partialUpdate,
-  getAgente,
   search,
+  create,
+  findById,
+  deleteCaso,
+  update,
+  patch,
 };

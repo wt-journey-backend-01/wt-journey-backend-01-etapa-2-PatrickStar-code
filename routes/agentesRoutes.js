@@ -7,12 +7,12 @@ router.get("/agentes", agentesController.findAll);
 
 router.get("/agentes/:id", agentesController.findById);
 
-router.post("/agentes", agentesController.createAgente);
+router.post("/agentes", agentesController.create);
 
 router.delete("/agentes/:id", agentesController.deleteAgente);
 
 router.put("/agentes/:id", agentesController.updateAgente);
 
-router.patch("/agentes/:id", agentesController.patchAgentes);
+router.patch("/agentes/:id", agentesController.patch);
 
 module.exports = router;
