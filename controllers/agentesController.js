@@ -9,7 +9,7 @@ const AgenteSchema = z.object({
   nome: z.string({ required_error: "O campo 'nome' é obrigatório." }),
 
   dataDeIncorporacao: z
-    .string({ required_error: "O campo 'nome' é obrigatório." })
+    .string({ required_error: "O campo 'dataDeIncorporacao' é obrigatório." })
     .regex(/^\d{4}-\d{2}-\d{2}$/, {
       message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
     }),
@@ -124,6 +124,7 @@ function updateAgente(req, res, next) {
     }
     const parsed = AgenteSchema.safeParse(req.body);
     if (!parsed.success) {
+      console.log("deu ruim");
       return res.status(400).json({ message: parsed.error.errors[0].message });
     }
     const agenteUpdated = agentesRepository.updateAgente(id, req.body);
