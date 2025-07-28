@@ -22,10 +22,18 @@ const searchQuerySchema = z.object({
 });
 
 const CasoSchema = z.object({
-  titulo: z.string({ required_error: "Titulo é obrigatório." }),
-  descricao: z.string({ required_error: "Descrição é obrigatório." }),
-  status: z.enum(enumStatus, { required_error: "Status é obrigatório." }),
-  agente_id: z.uuid({ required_error: "Agente é obrigatório." }),
+  titulo: z
+    .string({ required_error: "Titulo é obrigatório." })
+    .min(1, "O campo 'titulo' é obrigatório."),
+  descricao: z
+    .string({ required_error: "Descrição é obrigatório." })
+    .min(1, "O campo 'descricao' é obrigatório."),
+  status: z
+    .enum(enumStatus, { required_error: "Status é obrigatório." })
+    .min(1, "O campo 'status' é obrigatório."),
+  agente_id: z
+    .uuid({ required_error: "Agente é obrigatório." })
+    .min(1, "O campo 'agente_id' é obrigatório."),
 });
 
 const CasoPartial = CasoSchema.partial();
@@ -199,12 +207,12 @@ function getAgente(req, res, next) {
       return res.status(400).json({ message: "Parâmetros inválidos" });
     }
 
-    if (casosRepository.findById(casos_id) === undefined) {
+    const caso = casosRepository.findById(casos_id);
+    if (!caso) {
       return res.status(404).json({ message: "Caso inexistente" });
     }
-    const agente = agentesRepository.findById(
-      casosRepository.findById(casos_id).agente_id
-    );
+
+    const agente = agentesRepository.findById(caso.agente_id);
     if (!agente) {
       return res.status(404).json({ message: "Agente inexistente" });
     }

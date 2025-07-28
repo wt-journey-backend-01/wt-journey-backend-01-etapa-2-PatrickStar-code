@@ -28,8 +28,10 @@ function getAll({ agente_id, status } = {}) {
 }
 
 function search(q) {
-  const finded = casosData.filter((caso) =>
-    caso.titulo.toLowerCase().includes(q.toLowerCase())
+  const finded = casosData.filter(
+    (caso) =>
+      caso.titulo.toLowerCase().includes(q.toLowerCase()) ||
+      caso.descricao.toLowerCase().includes(q.toLowerCase())
   );
 
   if (finded.length === 0) {
@@ -51,7 +53,8 @@ function findById(id) {
 function update(id, caso) {
   const index = casosData.findIndex((c) => c.id === id);
   if (index !== -1) {
-    casosData[index] = { ...casosData[index], ...caso };
+    const { id: _, ...dadosSemId } = caso;
+    casosData[index] = { ...casosData[index], ...dadosSemId };
     return casosData[index];
   }
   return null;

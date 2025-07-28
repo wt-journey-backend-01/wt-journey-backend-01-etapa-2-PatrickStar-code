@@ -6,17 +6,16 @@ const { validate: isUuid } = require("uuid");
 const errorHandler = require("../utils/errorHandler");
 
 const AgenteSchema = z.object({
-  nome: z.string({ required_error: "O campo 'nome' é obrigatório." }),
-
+  nome: z.string().min(1, "O campo 'nome' não pode ser vazio."),
   dataDeIncorporacao: z
-    .string({ required_error: "O campo 'dataDeIncorporacao' é obrigatório." })
+    .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, {
       message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
+    })
+    .refine((date) => new Date(date) <= new Date(), {
+      message: "A data de incorporação não pode ser no futuro.",
     }),
-
-  cargo: z.string({
-    required_error: "O campo 'cargo' é obrigatório.",
-  }),
+  cargo: z.string().min(1, "O campo 'cargo' não pode ser vazio."),
 });
 
 const AgentePartial = AgenteSchema.partial();

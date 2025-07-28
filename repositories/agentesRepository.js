@@ -59,7 +59,9 @@ function updateAgente(id, agente) {
 function patch(id, agente) {
   const index = agentes.findIndex((agente) => agente.id === id);
   if (index !== -1) {
-    return (agentes[index] = { ...agentes[index], ...agente });
+    const { id: _, ...dadosSemId } = agente;
+    agentes[index] = { ...agentes[index], ...dadosSemId };
+    return agentes[index];
   }
   return null;
 }
