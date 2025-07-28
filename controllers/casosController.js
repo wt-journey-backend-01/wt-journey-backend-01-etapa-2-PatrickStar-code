@@ -28,9 +28,7 @@ const CasoSchema = z.object({
   descricao: z
     .string({ required_error: "Descrição é obrigatório." })
     .min(1, "O campo 'descricao' é obrigatório."),
-  status: z
-    .enum(enumStatus, { required_error: "Status é obrigatório." })
-    .min(1, "O campo 'status' é obrigatório."),
+  status: z.enum(enumStatus, { required_error: "Status é obrigatório." }),
   agente_id: z
     .uuid({ required_error: "Agente é obrigatório." })
     .min(1, "O campo 'agente_id' é obrigatório."),
