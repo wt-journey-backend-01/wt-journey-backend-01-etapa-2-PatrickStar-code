@@ -1,222 +1,120 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 1 créditos restantes para usar o sistema de feedback AI.
+Você tem 0 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para PatrickStar-code:
 
-Nota final: **33.5/100**
+Nota final: **63.6/100**
 
-Olá, PatrickStar-code! 🌟 Tudo bem? Primeiramente, parabéns pelo esforço e pela entrega da sua API para o Departamento de Polícia! 🚓👮‍♂️ Eu dei uma boa olhada no seu código e vi vários pontos muito legais que você acertou, além de algumas oportunidades de melhoria que, quando ajustadas, vão deixar sua API ainda mais robusta e alinhada com o que o desafio pede. Bora juntos destrinchar isso? 💪✨
+# Feedback para PatrickStar-code 🚀
 
----
-
-## 🎉 O que você mandou muito bem
-
-- Você estruturou o projeto de forma modular, separando rotas, controllers e repositories, o que é fundamental para manter o código organizado e escalável. Isso mostra que você já tem uma boa noção de arquitetura!  
-- O uso do **Zod** para validação de dados está muito bem aplicado, com schemas claros e tratamento de erros personalizado, o que ajuda bastante na robustez da API.  
-- Os endpoints para criação, leitura, atualização e exclusão tanto de agentes quanto de casos estão implementados, com tratamento para erros básicos (400 e 404).  
-- Você implementou o endpoint de busca simples por palavras-chave nos casos, que é um bônus legal e demonstra que está se esforçando para ir além! 👏  
-- A validação de UUID nos parâmetros de rota está presente, o que é ótimo para garantir que os IDs utilizados são válidos.
+Olá, Patrick! Primeiro, parabéns pelo esforço e pela entrega da sua API para o Departamento de Polícia! 🎉 Você estruturou muito bem o projeto, separando rotas, controllers e repositories, e isso é fundamental para um código organizado e escalável. 👏
 
 ---
 
-## 🔍 Pontos de atenção para evoluir (vamos no detalhe para você entender o que está acontecendo!)
+## 🎯 Pontos Fortes que Merecem Destaque
 
-### 1. IDs de agentes e casos não são UUIDs válidos na criação — isso gera penalidades!
+- **Arquitetura modular bem aplicada:** Você dividiu seu código em pastas e arquivos específicos para rotas, controllers e repositories, exatamente como esperado. Isso facilita muito a manutenção e o entendimento do projeto.
+  
+- **Implementação dos endpoints básicos:** Seu CRUD para agentes e casos está bem encaminhado, com os métodos HTTP implementados e funcionando para a maior parte dos cenários.
 
-Eu percebi que você está usando o `uuid` para gerar IDs, o que é perfeito, mas o problema está em como você está armazenando e manipulando esses IDs. No seu `repositories`, os arrays `agentes` e `casosData` estão vazios inicialmente, e você só adiciona os objetos com IDs gerados na criação. Isso é certo.
+- **Validação usando Zod:** A escolha de usar a biblioteca Zod para validação dos dados na entrada é ótima, isso traz robustez para a API.
 
-Porém, a penalidade indica que em alguns momentos os IDs usados não são UUIDs válidos. Isso geralmente acontece se, por exemplo, você tentou criar um agente ou caso com um ID que não é UUID, ou se o teste tentou usar um ID fixo inválido para buscar ou atualizar.
+- **Tratamento de erros e status codes:** Você está retornando os códigos HTTP corretos na maioria das situações (200, 201, 204, 400, 404), o que é essencial para uma API RESTful bem feita.
 
-**Possível causa raiz:**  
-- Talvez na sua lógica de update e patch, você esteja sobrescrevendo o ID ou aceitando objetos que têm IDs inválidos.  
-- Ou, no `updateAgente` e `update` de casos, você está atualizando os dados e, sem querer, alterando o ID para algo que não é UUID.
+- **Bônus conquistados:** Você implementou corretamente os filtros simples para casos por status e agente, além do filtro e ordenação para agentes por data de incorporação. Isso mostra que você foi além do básico, parabéns! 🎉
 
-Vamos olhar o seu `updateAgente` no `agentesRepository.js`:
+---
+
+## 🔍 Análise Profunda e Pontos de Melhoria
+
+### 1. Validações que ainda precisam ser reforçadas para garantir a integridade dos dados
+
+Ao analisar seu código, percebi que algumas validações importantes não estão sendo aplicadas, o que abre espaço para dados inconsistentes, como:
+
+- **Permitir agentes com nome vazio, cargo vazio ou data de incorporação no futuro.**  
+  No seu `agentesController.js`, o esquema Zod para `AgenteSchema` valida se o campo existe e o formato da data, mas não impede que o nome ou cargo sejam strings vazias, nem valida se a data não está no futuro.
+
+  Exemplo do seu esquema atual:
+  ```js
+  const AgenteSchema = z.object({
+    nome: z.string({ required_error: "O campo 'nome' é obrigatório." }),
+    dataDeIncorporacao: z
+      .string({ required_error: "O campo 'dataDeIncorporacao' é obrigatório." })
+      .regex(/^\d{4}-\d{2}-\d{2}$/, {
+        message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
+      }),
+    cargo: z.string({
+      required_error: "O campo 'cargo' é obrigatório.",
+    }),
+  });
+  ```
+
+  **Sugestão:**  
+  - Use `z.string().min(1, "mensagem")` para evitar strings vazias.  
+  - Para a data, além da regex, valide se a data não é futura, usando um refinamento (`refine`).  
+
+  Exemplo de melhoria:
+  ```js
+  const AgenteSchema = z.object({
+    nome: z.string().min(1, "O campo 'nome' não pode ser vazio."),
+    dataDeIncorporacao: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, {
+        message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
+      })
+      .refine((date) => new Date(date) <= new Date(), {
+        message: "A data de incorporação não pode ser no futuro.",
+      }),
+    cargo: z.string().min(1, "O campo 'cargo' não pode ser vazio."),
+  });
+  ```
+
+  Isso vai impedir que dados inválidos sejam aceitos e evita problemas futuros na API.
+
+  > Para entender melhor como fazer validações robustas com Zod, recomendo este vídeo super didático:  
+  > https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
+
+---
+
+### 2. ID não pode ser alterado via PUT ou PATCH
+
+No seu código, percebi que no método `updateAgente` e `patch` você permite que o `id` do agente seja alterado, porque no repositório você faz:
 
 ```js
-function updateAgente(id, agente) {
+// agentesRepository.js - updateAgente
+agentes[index] = { id, ...agente }; // aqui você garante que o id não muda no PUT, isso está correto
+
+// agentesRepository.js - patch
+return (agentes[index] = { ...agentes[index], ...agente }); // aqui o id pode ser sobrescrito se vier no patch
+```
+
+No patch, você está mesclando o objeto inteiro, incluindo o `id` que pode vir no corpo da requisição, o que não deveria acontecer.
+
+**Como corrigir?**  
+No patch, filtre o objeto para não permitir alteração do `id`. Por exemplo:
+
+```js
+function patch(id, agente) {
   const index = agentes.findIndex((agente) => agente.id === id);
   if (index !== -1) {
-    agentes[index] = { id, ...agente }; // garante que o id não seja alterado
+    const { id: _, ...dadosSemId } = agente; // remove id do objeto recebido
+    agentes[index] = { ...agentes[index], ...dadosSemId };
     return agentes[index];
   }
   return null;
 }
 ```
 
-Aqui você está garantindo que o `id` não seja alterado, o que é ótimo! Então, o problema pode estar em outro lugar.
-
-No `casosRepository.js`, veja o `update`:
-
-```js
-function update(id, caso) {
-  const index = casosData.findIndex((c) => c.id === id);
-  if (index !== -1) {
-    casosData[index] = { ...casosData[index], ...caso };
-    return casosData[index];
-  }
-  return null;
-}
-```
-
-Aqui, diferente do `updateAgente`, você está fazendo um spread de `casosData[index]` e depois do `caso` passado, que pode conter um `id` diferente! Isso pode estar sobrescrevendo o `id` original com um valor inválido.
-
-**Como corrigir:**  
-Você deve garantir que o `id` não seja alterado no update, como fez no `updateAgente`. Por exemplo:
-
-```js
-function update(id, caso) {
-  const index = casosData.findIndex((c) => c.id === id);
-  if (index !== -1) {
-    casosData[index] = { id, ...caso }; // mantém o id original
-    return casosData[index];
-  }
-  return null;
-}
-```
-
-Isso evita que o `id` seja sobrescrito por um valor inválido e mantém a integridade do UUID.
+Esse cuidado evita que o `id` seja alterado, mantendo a integridade dos dados.
 
 ---
 
-### 2. Falhas nos filtros e ordenação dos endpoints `/casos` e `/agentes`
+### 3. Validação de campos obrigatórios nos casos (título e descrição)
 
-Você implementou os filtros de agente e status para casos, e filtros de cargo e ordenação para agentes. Mas a maioria dos filtros bônus falhou, o que indica que eles não estão funcionando 100%.
+No seu `casosController.js`, o esquema `CasoSchema` valida os campos, mas não impede que `titulo` e `descricao` sejam strings vazias, o que não é desejável.
 
-No `casosRepository.js`, o filtro por status e agente está assim:
-
-```js
-function getAll({ agente_id, status } = {}) {
-  let result = [...casosData];
-
-  if (agente_id) {
-    result = result.filter((caso) => caso.agente_id === agente_id);
-  }
-
-  if (status) {
-    result = result.filter((caso) => caso.status === status);
-  }
-
-  return result;
-}
-```
-
-Isso parece correto, mas será que o parâmetro `agente_id` está vindo corretamente na rota? No controller `getAll` você faz:
-
-```js
-const parsed = QueryParamsSchema.safeParse(req.query);
-```
-
-E o schema espera `agente_id` como UUID opcional, o que é ótimo.
-
-No entanto, na rota `/casos`, o método é:
-
-```js
-router.get("/", casosController.getAll);
-```
-
-Então o endpoint existe, mas será que o cliente está enviando os parâmetros corretamente? Se o filtro não funciona, pode ser que o problema esteja no cliente ou nos testes, mas como não temos o cliente, vamos aceitar que está ok.
-
-Já no filtro de agentes, o `findAll` no repository está assim:
-
-```js
-function findAll({ cargo, sort } = {}) {
-  let result = [...agentes];
-
-  if (cargo) {
-    result = result.filter((agente) => agente.cargo === cargo);
-  }
-
-  if (sort) {
-    result = result.sort((a, b) => {
-      if (sort === "dataDeIncorporacao")
-        return a.dataDeIncorporacao.localeCompare(b.dataDeIncorporacao);
-      if (sort === "-dataDeIncorporacao")
-        return b.dataDeIncorporacao.localeCompare(a.dataDeIncorporacao);
-      return 0;
-    });
-  }
-
-  return result;
-}
-```
-
-Está correto, mas se não há agentes criados no array, o filtro não vai retornar nada. Certifique-se que você está criando agentes com datas válidas e no formato correto (`YYYY-MM-DD`), pois a ordenação depende disso.
-
----
-
-### 3. Endpoint para buscar agente responsável por um caso `/casos/:casos_id/agente` não está funcionando como esperado
-
-Você implementou o endpoint na rota:
-
-```js
-router.get("/:casos_id/agente", casosController.getAgente);
-```
-
-E no controller:
-
-```js
-function getAgente(req, res, next) {
-  try {
-    const { casos_id } = req.params;
-
-    if (!isUuid(casos_id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
-    }
-
-    if (casosRepository.findById(casos_id) === undefined) {
-      return res.status(404).json({ message: "Caso inexistente" });
-    }
-    const agente = agentesRepository.findById(
-      casosRepository.findById(casos_id).agente_id
-    );
-    if (!agente) {
-      return res.status(404).json({ message: "Agente inexistente" });
-    }
-    return res.status(200).json(agente);
-  } catch (error) {
-    next(error);
-  }
-}
-```
-
-O código parece correto, mas o teste bônus falhou para esse endpoint. Isso pode indicar que:
-
-- O `casosRepository.findById(casos_id)` está retornando `undefined` porque o caso não existe (pode ser que o caso não tenha sido criado antes do teste).  
-- Ou o agente vinculado ao caso não existe no array `agentes`.
-
-Você precisa garantir que, ao criar casos, o `agente_id` seja válido e que o agente exista no repositório. Se não existir, o endpoint não funcionará.
-
----
-
-### 4. Mensagens de erro customizadas para argumentos inválidos não estão aparecendo
-
-Você usa o Zod para validar e retorna o primeiro erro com:
-
-```js
-return res.status(400).json({ message: parsed.error.errors[0].message });
-```
-
-Isso está ótimo, mas os testes bônus indicam que as mensagens personalizadas para argumentos inválidos não estão 100% implementadas para todos os casos.
-
-Recomendo revisar seus schemas para garantir que todas as validações tenham mensagens customizadas, por exemplo:
-
-```js
-const AgenteSchema = z.object({
-  nome: z.string({ required_error: "O campo 'nome' é obrigatório." }),
-  dataDeIncorporacao: z.string({ required_error: "O campo 'dataDeIncorporacao' é obrigatório." })
-    .regex(/^\d{4}-\d{2}-\d{2}$/, {
-      message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
-    }),
-  cargo: z.enum(["inspetor", "delegado", "agente"], {
-    required_error: "O campo 'cargo' é obrigatório.",
-    invalid_type_error: "O campo 'cargo' deve ser 'inspetor', 'delegado' ou 'agente'.",
-  }),
-});
-```
-
-Você fez isso muito bem no agente, mas veja se fez igual para casos. No `casosController.js`, o `CasoSchema` está assim:
+Seu esquema atual:
 
 ```js
 const CasoSchema = z.object({
@@ -227,13 +125,118 @@ const CasoSchema = z.object({
 });
 ```
 
-Está correto, só tome cuidado para não misturar `required_error` e `invalid_type_error` para cobrir todos os casos.
+**Sugestão:**  
+Use `.min(1, "mensagem")` para garantir que o título e descrição não sejam vazios:
+
+```js
+const CasoSchema = z.object({
+  titulo: z.string().min(1, "Titulo não pode ser vazio."),
+  descricao: z.string().min(1, "Descrição não pode ser vazia."),
+  status: z.enum(enumStatus, { required_error: "Status é obrigatório." }),
+  agente_id: z.uuid({ required_error: "Agente é obrigatório." }),
+});
+```
 
 ---
 
-### 5. Organização geral e estrutura do projeto
+### 4. Filtros e busca por palavras-chave nos casos não estão implementados corretamente
 
-Sua estrutura está muito boa e segue o padrão esperado:
+Você implementou o filtro por `status` e `agente_id` no endpoint `/casos` e isso está funcionando, mas o endpoint de busca por palavras-chave (`/casos/search`) não parece estar filtrando pela descrição, só pelo título:
+
+```js
+function search(q) {
+  const finded = casosData.filter((caso) =>
+    caso.titulo.toLowerCase().includes(q.toLowerCase())
+  );
+
+  if (finded.length === 0) {
+    return null;
+  }
+  return finded;
+}
+```
+
+**Sugestão:**  
+Para atender ao requisito de buscar tanto no título quanto na descrição, altere para:
+
+```js
+function search(q) {
+  const finded = casosData.filter((caso) =>
+    caso.titulo.toLowerCase().includes(q.toLowerCase()) ||
+    caso.descricao.toLowerCase().includes(q.toLowerCase())
+  );
+
+  if (finded.length === 0) {
+    return null;
+  }
+  return finded;
+}
+```
+
+Assim, a busca será mais completa e atenderá melhor o esperado.
+
+---
+
+### 5. Endpoint para retornar o agente responsável por um caso (`GET /casos/:casos_id/agente`) não está funcionando
+
+Você tem o endpoint definido em `casosRoutes.js`:
+
+```js
+router.get("/:casos_id/agente", casosController.getAgente);
+```
+
+E a função `getAgente` no controller está implementada, mas o teste indica que ele não está funcionando corretamente.
+
+Ao analisar seu código, percebi que o problema pode estar no uso da variável `casos_id` (plural) no parâmetro da rota, que é incomum e pode causar confusão. Além disso, ao buscar o agente, você faz duas vezes `casosRepository.findById(casos_id)` — poderia otimizar para uma única chamada.
+
+**Sugestão:**  
+- Verifique se o parâmetro está correto e consistente. Geralmente, usamos `:id` ou `:caso_id` (singular).  
+- Simplifique a função para evitar chamadas repetidas:
+
+```js
+function getAgente(req, res, next) {
+  try {
+    const { casos_id } = req.params;
+
+    if (!isUuid(casos_id)) {
+      return res.status(400).json({ message: "Parâmetros inválidos" });
+    }
+
+    const caso = casosRepository.findById(casos_id);
+    if (!caso) {
+      return res.status(404).json({ message: "Caso inexistente" });
+    }
+
+    const agente = agentesRepository.findById(caso.agente_id);
+    if (!agente) {
+      return res.status(404).json({ message: "Agente inexistente" });
+    }
+    return res.status(200).json(agente);
+  } catch (error) {
+    next(error);
+  }
+}
+```
+
+Além disso, teste a rota manualmente para garantir que está respondendo corretamente.
+
+---
+
+### 6. Mensagens de erro personalizadas para argumentos inválidos
+
+Você está retornando mensagens de erro, mas elas não estão sempre claras ou personalizadas para cada campo, o que pode dificultar o entendimento do cliente da API.
+
+Por exemplo, ao validar query params ou body, você retorna apenas o primeiro erro do Zod, mas poderia estruturar mensagens mais completas.
+
+**Sugestão:**  
+- Crie um middleware ou função para formatar erros de validação com mais detalhes.  
+- Use o `errorHandler` que você já importou, mas não está sendo usado no controller, para centralizar o tratamento de erros e enviar respostas consistentes.
+
+---
+
+### 7. Organização e Estrutura do Projeto
+
+Sua estrutura de diretórios está correta, seguindo o esperado:
 
 ```
 .
@@ -246,38 +249,47 @@ Sua estrutura está muito boa e segue o padrão esperado:
 └── utils/
 ```
 
-Parabéns por isso! Isso facilita muito a manutenção e escalabilidade do projeto.
+Isso é excelente! Manter essa organização vai facilitar muito seu crescimento no projeto.
 
 ---
 
-## 💡 Recomendações de aprendizado para você avançar ainda mais
+## 📚 Recomendações de Estudos para Potencializar seu Código
 
-- Para entender melhor como garantir que IDs não sejam sobrescritos em updates, veja este vídeo sobre manipulação de dados em arrays e objetos no Node.js:  
-  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI  
-- Para aprofundar a validação e tratamento de erros com mensagens customizadas usando Zod, recomendo este vídeo:  
+- **Validação avançada com Zod e refinamentos:**  
   https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
-- Para entender como estruturar rotas e controllers corretamente no Express, este conteúdo oficial é fantástico:  
+
+- **Express.js e organização de rotas:**  
   https://expressjs.com/pt-br/guide/routing.html  
-- Para solidificar sua base em API REST e status HTTP, veja este vídeo que explica muito bem os códigos de status e métodos HTTP:  
-  https://youtu.be/RSZHvQomeKE  
+
+- **Arquitetura MVC em Node.js:**  
+  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH  
+
+- **HTTP Status Codes e boas práticas em APIs REST:**  
+  https://youtu.be/RSZHvQomeKE?si=PSkGqpWSRY90Ded5  
+
+- **Manipulação de arrays em JS (filter, find, map):**  
+  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI  
 
 ---
 
-## 📝 Resumo para você focar
+## 📝 Resumo dos Principais Pontos para Focar
 
-- **Corrija a sobrescrição do `id` no método `update` do `casosRepository` para garantir que o UUID original não seja alterado.**  
-- **Garanta que, ao criar casos, o `agente_id` existe no repositório de agentes para que o endpoint `/casos/:casos_id/agente` funcione corretamente.**  
-- **Revise e padronize as mensagens customizadas de erro em todos os schemas Zod para cobrir todos os casos de validação.**  
-- **Teste bem os filtros e ordenações para garantir que eles estão funcionando conforme esperado, especialmente para os casos e agentes.**  
-- **Continue mantendo a organização do projeto, pois isso é um diferencial!**
+- [ ] **Reforce as validações dos dados usando Zod:** evite strings vazias, datas futuras e IDs alterados.  
+- [ ] **Impeça alteração do campo `id` nos métodos PATCH e PUT nos repositories.**  
+- [ ] **Ajuste a busca de casos para filtrar título e descrição.**  
+- [ ] **Revise o endpoint `/casos/:casos_id/agente` para garantir que está funcionando e usando parâmetros claros.**  
+- [ ] **Implemente mensagens de erro personalizadas e consistentes, usando um middleware de tratamento de erros.**  
+- [ ] **Continue mantendo sua estrutura modular e organizada, isso é um diferencial!**  
 
 ---
 
-Patrick, você está no caminho certo e sua base já é muito boa! 🚀 Com esses ajustes, sua API vai ficar muito mais sólida e pronta para o próximo nível. Continue praticando, estudando e não hesite em explorar os recursos que indiquei para dominar esses conceitos. Estou aqui torcendo pelo seu sucesso! 🎯🔥
+Patrick, você está no caminho certo, só precisa ajustar esses detalhes para sua API ficar ainda mais robusta e profissional! 🚀
 
-Se precisar de mais ajuda, é só chamar! 🤗👨‍💻
+Continue firme, pois o aprendizado vem com a prática e a correção desses pequenos detalhes. Estou aqui torcendo pelo seu sucesso! 💪✨
 
-Um abraço de Code Buddy! 🤖💙
+Se precisar, volte a estudar os recursos que recomendei e experimente aplicar as mudanças aos poucos. Vai dar muito certo! 😉
+
+Abraços e bons códigos! 👨‍💻👩‍💻
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
