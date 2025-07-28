@@ -14,22 +14,15 @@ const AgenteSchema = z.object({
       message: "O campo 'dataDeIncorporacao' deve ser no formato 'YYYY-MM-DD'.",
     }),
 
-  cargo: z.enum(["inspetor", "delegado", "agente"], {
+  cargo: z.string({
     required_error: "O campo 'cargo' é obrigatório.",
-    invalid_type_error:
-      "O campo 'cargo' deve ser 'inspetor', 'delegado' ou 'agente'.",
   }),
 });
 
 const AgentePartial = AgenteSchema.partial();
 
 const querySchema = z.object({
-  cargo: z
-    .enum(["inspetor", "delegado", "agente"], {
-      invalid_type_error:
-        "O campo 'cargo' deve ser 'inspetor', 'delegado' ou 'agente'.",
-    })
-    .optional(),
+  cargo: z.string().optional(),
   sort: z
     .enum(["dataDeIncorporacao", "-dataDeIncorporacao"], {
       invalid_type_error:

@@ -28,7 +28,10 @@ function getAll({ agente_id, status } = {}) {
 }
 
 function search(q) {
-  const finded = casosData.filter((caso) => caso.titulo.includes(q));
+  const finded = casosData.filter((caso) =>
+    caso.titulo.toLowerCase().includes(q.toLowerCase())
+  );
+
   if (finded.length === 0) {
     return null;
   }

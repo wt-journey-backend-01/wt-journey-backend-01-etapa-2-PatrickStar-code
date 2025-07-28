@@ -78,7 +78,6 @@ router.get("/:id", agentesController.findById);
  *                 format: date
  *               cargo:
  *                 type: string
- *                 enum: [inspetor, delegado, agente]
  *     responses:
  *       201:
  *         description: Agente criado
