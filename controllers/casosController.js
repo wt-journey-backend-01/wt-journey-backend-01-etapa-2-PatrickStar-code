@@ -94,7 +94,7 @@ function getById(req, res, next) {
 
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
 
@@ -115,7 +115,7 @@ function update(req, res, next) {
 
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
 
@@ -144,7 +144,7 @@ function deleteCaso(req, res, next) {
     const { id } = req.params;
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
 
@@ -167,7 +167,7 @@ function patch(req, res, next) {
     const { id } = req.params;
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
 
@@ -202,7 +202,7 @@ function getAgente(req, res, next) {
     const { casos_id } = req.params;
 
     if (!isUuid(casos_id)) {
-      return res.status(400).json({ message: "Parâmetros inválidos" });
+      return res.status(404).json({ message: "Parâmetros inválidos" });
     }
 
     const caso = casosRepository.findById(casos_id);

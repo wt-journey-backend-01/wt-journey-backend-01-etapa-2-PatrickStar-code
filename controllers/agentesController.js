@@ -54,7 +54,7 @@ function findById(req, res, next) {
     const id = req.params.id;
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
@@ -88,7 +88,7 @@ function deleteAgente(req, res, next) {
     const { id } = req.params;
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
@@ -107,7 +107,7 @@ function updateAgente(req, res, next) {
     const { id } = req.params;
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
@@ -137,7 +137,7 @@ function patch(req, res, next) {
     const { id } = req.params;
     if (!isUuid(id)) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "ID inválido. Use um UUID válido." });
     }
     const agente = agentesRepository.findById(id);
