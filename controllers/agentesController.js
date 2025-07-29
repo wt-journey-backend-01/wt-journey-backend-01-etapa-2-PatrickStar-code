@@ -119,6 +119,13 @@ function updateAgente(req, res, next) {
       console.log(parsed);
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
+
+    if ("id" in req.body) {
+      return res
+        .status(400)
+        .json({ message: "O campo 'id' nao pode ser alterado." });
+    }
+
     const { id: _, ...dadosSemId } = req.body;
     const agenteUpdated = agentesRepository.updateAgente(id, dadosSemId);
     if (agenteUpdated === null) {
@@ -148,6 +155,12 @@ function patch(req, res, next) {
     const parsed = AgentePartial.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
+    }
+
+    if ("id" in req.body) {
+      return res
+        .status(400)
+        .json({ message: "O campo 'id' nao pode ser alterado." });
     }
 
     const { id: _, ...dadosSemId } = req.body;

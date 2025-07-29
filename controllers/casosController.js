@@ -126,6 +126,11 @@ function update(req, res, next) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
+    if ("id" in req.body) {
+      return res
+        .status(400)
+        .json({ message: "O campo 'id' nao pode ser alterado." });
+    }
     const { id: _, ...dadosSemId } = req.body;
     const caso = casosRepository.update(id, dadosSemId);
     if (!caso) {
@@ -189,6 +194,13 @@ function patch(req, res, next) {
     if (casosRepository.findById(id) === undefined) {
       return res.status(404).json({ message: "Caso inexistente" });
     }
+
+    if ("id" in req.body) {
+      return res
+        .status(400)
+        .json({ message: "O campo 'id' nao pode ser alterado." });
+    }
+
     const { id: _, ...dadosSemId } = req.body;
     const caso = casosRepository.patch(id, dadosSemId);
     if (!caso) {
