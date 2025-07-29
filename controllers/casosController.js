@@ -74,7 +74,7 @@ function create(req, res, next) {
     const parsed = CasoSchema.safeParse(req.body);
 
     if (!parsed.success) {
-      return res.status(404).json({ message: parsed.error.issues[0].message });
+      return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
     if (agentesRepository.findById(req.body.agente_id) === undefined) {
@@ -123,7 +123,7 @@ function update(req, res, next) {
     const parsed = CasoSchema.safeParse(req.body);
 
     if (!parsed.success) {
-      return res.status(404).json({ message: parsed.error.issues[0].message });
+      return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
     const caso = casosRepository.update(id, req.body);

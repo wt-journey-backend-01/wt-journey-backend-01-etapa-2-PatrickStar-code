@@ -34,7 +34,6 @@ function findById(id) {
 }
 
 function create(agente) {
-  
   agentes.push(agente);
   return agente;
 }
@@ -52,7 +51,7 @@ function updateAgente(id, agente) {
   const index = agentes.findIndex((agente) => agente.id === id);
   if (index !== -1) {
     const { id: _, ...dadosSemId } = agente;
-    agentes[index] = { id, ...dadosSemId };
+    agentes[index] = { ...agentes[index], ...dadosSemId };
     return agentes[index];
   }
   return null;
