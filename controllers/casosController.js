@@ -78,7 +78,7 @@ function create(req, res, next) {
     }
 
     if (agentesRepository.findById(req.body.agente_id) === undefined) {
-      return res.status(400).json({ message: "Agente inexistente" });
+      return res.status(404).json({ message: "Agente inexistente" });
     }
 
     const NewCaso = { id: uuidv4(), ...req.body };
