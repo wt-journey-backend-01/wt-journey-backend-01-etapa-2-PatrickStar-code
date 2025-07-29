@@ -77,6 +77,14 @@ function create(req, res, next) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
+    if (
+      !parsed.sucess &&
+      parsed.error.issues[0].code === "invalid_format" &&
+      parsed.error.issues[0].format === "uuid"
+    ) {
+      return res.status(404).json({ message: parsed.error.issues[0].message });
+    }
+
     if (!parsed.success) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
