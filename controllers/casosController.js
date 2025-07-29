@@ -78,7 +78,7 @@ function create(req, res, next) {
     }
 
     if (
-      !parsed.sucess &&
+      !parsed.success &&
       parsed.error.issues[0].code === "invalid_format" &&
       parsed.error.issues[0].format === "uuid"
     ) {
