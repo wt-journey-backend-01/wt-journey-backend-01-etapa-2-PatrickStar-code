@@ -50,8 +50,7 @@ function deleteAgente(id) {
 function updateAgente(id, agente) {
   const index = agentes.findIndex((agente) => agente.id === id);
   if (index !== -1) {
-    const { id: _, ...dadosSemId } = agente;
-    agentes[index] = { ...agentes[index], ...dadosSemId };
+    agentes[index] = { ...agentes[index], ...agente };
     return agentes[index];
   }
   return null;
@@ -60,8 +59,7 @@ function updateAgente(id, agente) {
 function patch(id, agente) {
   const index = agentes.findIndex((agente) => agente.id === id);
   if (index !== -1) {
-    const { id: _, ...dadosSemId } = agente;
-    agentes[index] = { ...agentes[index], ...dadosSemId };
+    agentes[index] = { ...agentes[index], ...agente };
     return agentes[index];
   }
   return null;
