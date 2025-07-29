@@ -116,7 +116,7 @@ function updateAgente(req, res, next) {
     }
     const parsed = AgenteSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ message: parsed.error.errors[0].message });
+      return res.status(404).json({ message: parsed.error.errors[0].message });
     }
     const agenteUpdated = agentesRepository.updateAgente(id, req.body);
     if (agenteUpdated === null) {
