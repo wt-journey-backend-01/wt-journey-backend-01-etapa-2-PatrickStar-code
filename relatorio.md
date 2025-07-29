@@ -2,9 +2,9 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - PatrickStar-code
 
-**Data:** 29/07/2025 17:51
+**Data:** 29/07/2025 17:58
 
-**Nota Final:** `83.70/100`
+**Nota Final:** `90.26/100`
 **Status:** ✅ Aprovado
 
 ---
@@ -25,13 +25,7 @@
     - Ótimo! A filtragem de casos por `agente_id` (`GET /casos?agente_id=...`) está funcionando corretamente. Isso permite listar casos específicos de cada agente.
 
 ## ❌ Problemas Detectados (Descontos de até 100 pontos)
-- Foram encontrados `3` problemas que acarretam descontos. Veja abaixo os testes penalizados:
-  - ⚠️ **Falhou no teste de penalidade**: `Validation: Consegue alterar ID do agente com método PUT`
-    - **Correção sugerida**: Nenhuma sugestão de correção disponível.
-  - ⚠️ **Falhou no teste de penalidade**: `Validation: Consegue alterar ID do agente com método PATCH`
-    - **Correção sugerida**: Nenhuma sugestão de correção disponível.
-  - ⚠️ **Falhou no teste de penalidade**: `Validation: Consegue alterar ID do caso com método PUT`
-    - **Correção sugerida**: Nenhuma sugestão de correção disponível.
+- Nenhuma infração grave foi detectada. Muito bom nesse aspecto!
 
 ---
 Continue praticando e caprichando no código. Cada detalhe conta! 💪
