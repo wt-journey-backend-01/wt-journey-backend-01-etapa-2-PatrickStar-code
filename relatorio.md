@@ -2,18 +2,24 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - PatrickStar-code
 
-**Data:** 28/07/2025 23:57
+**Data:** 29/07/2025 00:09
 
-**Nota Final:** `86.02/100`
+**Nota Final:** `76.28/100`
 **Status:** ✅ Aprovado
 
 ---
 ## ✅ Requisitos Obrigatórios
-- Foram encontrados `2` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+- Foram encontrados `5` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 400 ao tentar criar agente com payload em formato incorreto`
+    - **Melhoria sugerida**: Seu endpoint de criação de agentes (`POST /agentes`) não está validando payloads incorretos. O teste enviou dados inválidos e esperava um status `400 Bad Request`, mas recebeu outro. Implemente uma validação robusta para os dados de entrada.
+  - ⚠️ **Falhou no teste**: `UPDATE: Recebe status code 400 ao tentar atualizar agente por completo com método PUT e payload em formato incorreto`
+    - **Melhoria sugerida**: Sua rota de atualização completa de agentes (`PUT /agentes/:id`) não está retornando `400 Bad Request` para payloads inválidos. Garanta que a validação de dados ocorra antes da tentativa de atualização.
   - ⚠️ **Falhou no teste**: `UPDATE: Recebe status code 400 ao tentar atualizar agente parcialmente com método PATCH e payload em formato incorreto`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
-  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 404 ao tentar criar caso com id de agente inválido/inexistente`
-    - **Melhoria sugerida**: Ao tentar criar um caso com um `agente_id` inexistente, o teste não recebeu `404 Not Found`. Sua API deve ser capaz de identificar que o agente referenciado não existe e retornar o status apropriado.
+  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 400 ao tentar criar caso com payload em formato incorreto`
+    - **Melhoria sugerida**: Seu endpoint de criação de casos (`POST /casos`) não está validando payloads incorretos. O teste enviou dados inválidos e esperava um status `400 Bad Request`, mas recebeu outro. Implemente uma validação robusta para os dados de entrada.
+  - ⚠️ **Falhou no teste**: `UPDATE: Recebe status code 400 ao tentar atualizar um caso por completo com método PUT com payload em formato incorreto`
+    - **Melhoria sugerida**: Sua rota de atualização completa de casos (`PUT /casos/:id`) não está retornando `400 Bad Request` para payloads inválidos. Garanta que a validação de dados ocorra antes da tentativa de atualização.
 
 ## ⭐ Itens de Destaque (recupera até 40 pontos)
 - Você conquistou `2` bônus! Excelente trabalho nos detalhes adicionais!
