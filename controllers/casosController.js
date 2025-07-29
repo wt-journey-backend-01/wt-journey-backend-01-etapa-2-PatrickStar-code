@@ -74,7 +74,7 @@ function create(req, res, next) {
     const parsed = CasoSchema.safeParse(req.body);
 
     if (!parsed.success) {
-      return res.status(400).json({ message: parsed.error.issues[0].message });
+      return res.status(404).json({ message: parsed.error.issues[0].message });
     }
 
     if (agentesRepository.findById(req.body.agente_id) === undefined) {
@@ -126,7 +126,8 @@ function update(req, res, next) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
 
-    const caso = casosRepository.update(id, req.body);
+    const { id: _, ...dadosSemId } = req.body;
+    const caso = casosRepository.update(id, dadosSemId);
     if (!caso) {
       return res.status(404).json({ message: "Caso inexistente" });
     }
@@ -188,8 +189,8 @@ function patch(req, res, next) {
     if (casosRepository.findById(id) === undefined) {
       return res.status(404).json({ message: "Caso inexistente" });
     }
-
-    const caso = casosRepository.patch(id, req.body);
+    const { id: _, ...dadosSemId } = req.body;
+    const caso = casosRepository.patch(id, dadosSemId);
     if (!caso) {
       return res.status(404).json({ message: "Caso inexistente" });
     }

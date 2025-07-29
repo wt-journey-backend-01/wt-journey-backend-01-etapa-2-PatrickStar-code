@@ -119,7 +119,8 @@ function updateAgente(req, res, next) {
       console.log(parsed);
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
-    const agenteUpdated = agentesRepository.updateAgente(id, req.body);
+    const { id: _, ...dadosSemId } = req.body;
+    const agenteUpdated = agentesRepository.updateAgente(id, dadosSemId);
     if (agenteUpdated === null) {
       return res
         .status(404)
@@ -148,7 +149,9 @@ function patch(req, res, next) {
     if (!parsed.success) {
       return res.status(400).json({ message: parsed.error.issues[0].message });
     }
-    const agenteUpdated = agentesRepository.patch(id, req.body);
+
+    const { id: _, ...dadosSemId } = req.body;
+    const agenteUpdated = agentesRepository.patch(id, dadosSemId);
     if (agenteUpdated === null) {
       return res
         .status(404)
