@@ -2,7 +2,7 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - PatrickStar-code
 
-**Data:** 29/07/2025 18:22
+**Data:** 29/07/2025 18:25
 
 **Nota Final:** `94.90/100`
 **Status:** ✅ Aprovado
@@ -10,8 +10,8 @@
 ---
 ## ✅ Requisitos Obrigatórios
 - Foram encontrados `1` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
-  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 404 ao tentar criar caso com id de agente inválido/inexistente`
-    - **Melhoria sugerida**: Ao tentar criar um caso com um `agente_id` inexistente, o teste não recebeu `404 Not Found`. Sua API deve ser capaz de identificar que o agente referenciado não existe e retornar o status apropriado.
+  - ⚠️ **Falhou no teste**: `CREATE: Recebe status code 400 ao tentar criar caso com payload em formato incorreto`
+    - **Melhoria sugerida**: Seu endpoint de criação de casos (`POST /casos`) não está validando payloads incorretos. O teste enviou dados inválidos e esperava um status `400 Bad Request`, mas recebeu outro. Implemente uma validação robusta para os dados de entrada.
 
 ## ⭐ Itens de Destaque (recupera até 40 pontos)
 - Você conquistou `2` bônus! Excelente trabalho nos detalhes adicionais!
