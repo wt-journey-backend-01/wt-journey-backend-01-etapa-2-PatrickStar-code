@@ -34,7 +34,7 @@ const CasoSchema = z.object({
     .min(1, "O campo 'agente_id' é obrigatório."),
 });
 
-const CasoPartial = CasoSchema.partial();
+const CasoPartial = CasoSchema.partial().strict();
 
 function getAll(req, res, next) {
   const parsed = QueryParamsSchema.safeParse(req.query);
@@ -78,7 +78,7 @@ function create(req, res, next) {
     }
 
     if (agentesRepository.findById(req.body.agente_id) === undefined) {
-      return res.status(404).json({ message: "Agente inexistente" });
+      return res.status(400).json({ message: "Agente inexistente" });
     }
 
     const NewCaso = { id: uuidv4(), ...req.body };

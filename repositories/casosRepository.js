@@ -53,7 +53,6 @@ function findById(id) {
 function update(id, caso) {
   const index = casosData.findIndex((c) => c.id === id);
   if (index !== -1) {
-    const { id: _, ...dadosSemId } = caso;
     casosData[index] = { ...casosData[index], ...caso };
     return casosData[index];
   }
@@ -72,7 +71,6 @@ function deleteCaso(id) {
 function patch(id, NewCaso) {
   const index = casosData.findIndex((caso) => caso.id === id);
   if (index !== -1) {
-    const { id: _, ...dadosSemId } = caso;
     casosData[index] = { ...casosData[index], ...NewCaso };
     return casosData[index];
   }

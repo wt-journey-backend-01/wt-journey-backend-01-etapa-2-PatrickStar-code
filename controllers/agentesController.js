@@ -18,7 +18,7 @@ const AgenteSchema = z.object({
   cargo: z.string().min(1, "O campo 'cargo' não pode ser vazio."),
 });
 
-const AgentePartial = AgenteSchema.partial();
+const AgentePartial = AgenteSchema.partial().strict();
 
 const querySchema = z.object({
   cargo: z.string().optional(),
